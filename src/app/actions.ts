@@ -7,6 +7,12 @@ import { revalidatePath } from "next/cache";
 export async function processImageAction(base64Image: string) {
   try {
     const analysis = await analyzeImage(base64Image);
+    
+    // Validate AI response structure
+    if (!analysis || !analysis.category || !analysis.severity) {
+       return { success: false, error: "Malformed AI response" };
+    }
+    
     return { success: true, data: analysis };
   } catch {
     return { success: false, error: "Failed to analyze image" };

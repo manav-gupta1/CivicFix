@@ -1,7 +1,7 @@
 import { fetchReportByIdAction } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Calendar, Activity, AlertTriangle, CheckCircle2, Clock } from "lucide-react";
+import { MapPin, Calendar, Activity, AlertTriangle, CheckCircle2, Clock, Info } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -23,10 +23,10 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
   }
 
   const statuses = [
-    { id: 'submitted', label: 'Submitted', desc: 'Report received' },
-    { id: 'assigned', label: 'Assigned', desc: 'Sent to responsible team' },
-    { id: 'in_progress', label: 'In Progress', desc: 'Resolution underway' },
-    { id: 'resolved', label: 'Resolved', desc: 'Awaiting completion' }
+    { id: 'submitted', label: 'Submitted', desc: 'Report received', activeMsg: 'Your report has been received and is awaiting review.' },
+    { id: 'assigned', label: 'Assigned', desc: 'Sent to responsible team', activeMsg: 'A municipal team has been assigned to investigate this issue.' },
+    { id: 'in_progress', label: 'In Progress', desc: 'Resolution underway', activeMsg: 'Work is currently underway to resolve this civic issue.' },
+    { id: 'resolved', label: 'Resolved', desc: 'Awaiting completion', activeMsg: 'This issue has been successfully resolved.' }
   ];
 
   const currentStatusIndex = statuses.findIndex(s => s.id === report.status);
@@ -37,7 +37,9 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{report.title}</h1>
           <p className="text-muted-foreground mt-1 flex items-center">
-            <span className="font-mono text-sm bg-muted px-2 py-1 rounded mr-3">ID: {report.id}</span>
+            <span className="font-mono text-sm bg-muted px-2 py-1 rounded mr-3 text-foreground font-semibold flex items-center gap-1">
+              {report.id}
+            </span>
             <Calendar className="h-4 w-4 mr-1" /> {new Date(report.created_at).toLocaleDateString()}
           </p>
         </div>
@@ -51,7 +53,7 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-6">
-          <Card className="shadow-sm">
+          <Card className="shadow-sm overflow-hidden">
             <CardHeader className="bg-muted/30 border-b">
               <CardTitle className="text-lg">Issue Details</CardTitle>
             </CardHeader>
@@ -113,7 +115,7 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
             <CardHeader className="bg-muted/30 border-b">
               <CardTitle className="text-lg">Resolution Timeline</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-6 pb-2">
               <div className="relative border-l-2 border-muted ml-4 space-y-8 py-2">
                 {statuses.map((status, index) => {
                   const isCompleted = index < currentStatusIndex;
@@ -130,6 +132,13 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
                           {status.label}
                         </h4>
                         <p className="text-sm text-muted-foreground mt-0.5">{status.desc}</p>
+                        
+                        {isCurrent && (
+                          <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-lg text-sm text-blue-800 dark:text-blue-300 flex items-start gap-2">
+                             <Info className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                             <span>{status.activeMsg}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   );

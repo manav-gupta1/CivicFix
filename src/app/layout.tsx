@@ -16,6 +16,8 @@ export const metadata: Metadata = {
   description: "Turn everyday civic problems into actionable reports in seconds.",
 };
 
+import Link from "next/link";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,13 +28,18 @@ export default function RootLayout({
       <body className={`${geistMono.variable} antialiased min-h-screen flex flex-col`}>
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <div className="container mx-auto flex h-16 items-center px-4 justify-between">
-            <a href="/" className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-primary">CivicFix</span>
-            </a>
-            <nav className="flex items-center space-x-6 text-sm font-medium">
-              <a href="/report" className="transition-colors hover:text-foreground/80 text-foreground/60">Report</a>
-              <a href="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground/60">Dashboard</a>
+            <Link href="/" className="flex items-center space-x-2">
+              <span className="text-2xl font-bold text-primary tracking-tight">CivicFix</span>
+            </Link>
+            <nav className="hidden sm:flex items-center space-x-8 text-sm font-medium">
+              <Link href="/report" className="transition-colors hover:text-primary text-foreground/80">Report Problem</Link>
+              <Link href="/dashboard" className="transition-colors hover:text-primary text-foreground/80">Dashboard</Link>
+              <Link href="/dashboard" className="transition-colors hover:text-primary text-foreground/80">My Reports</Link>
             </nav>
+            <div className="sm:hidden flex items-center space-x-4 text-sm font-medium">
+              <Link href="/report" className="text-primary font-semibold">Report</Link>
+              <Link href="/dashboard" className="text-foreground/80">Dashboard</Link>
+            </div>
           </div>
         </header>
         <main className="flex-1">

@@ -74,7 +74,7 @@ export async function getReportById(id: string): Promise<Report | undefined> {
 export async function createReport(reportData: Omit<Report, 'id' | 'created_at' | 'status'>): Promise<Report> {
   const newReport: Report = {
     ...reportData,
-    id: `CF-${Math.floor(10000 + Math.random() * 90000)}`,
+    id: `CF-${Math.random().toString(16).substring(2, 7).toUpperCase()}`,
     created_at: new Date().toISOString(),
     status: 'submitted'
   };

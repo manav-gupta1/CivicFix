@@ -2,7 +2,7 @@ import { fetchReportsAction } from "@/app/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { Activity, CheckCircle2, Clock, MapPin, AlertCircle } from "lucide-react";
+import { Activity, CheckCircle2, Clock, MapPin, BarChart3, PieChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
@@ -33,6 +33,12 @@ export default async function DashboardPage() {
     return acc;
   }, {} as Record<string, number>);
 
+  // Group by status
+  const statuses = reports.reduce((acc, curr) => {
+    acc[curr.status] = (acc[curr.status] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8 animate-in fade-in duration-500">
       <div className="mb-8 border-b pb-6">
@@ -40,7 +46,7 @@ export default async function DashboardPage() {
         <p className="text-muted-foreground mt-2">Real-time overview of community issues and resolutions.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <Card className="shadow-sm border-none bg-primary/5">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Total Reports</CardTitle>
@@ -73,11 +79,11 @@ export default async function DashboardPage() {
         </Card>
         <Card className="shadow-sm border-border">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Avg. Resolution</CardTitle>
+            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Avg Resolution</CardTitle>
             <Clock className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-extrabold">2.4<span className="text-2xl font-bold text-muted-foreground ml-1">days</span></div>
+            <div className="text-4xl font-extrabold">2.4<span className="text-2xl font-bold text-muted-foreground ml-1">d</span></div>
             <p className="text-xs text-muted-foreground mt-2 font-medium">Average time to fix</p>
           </CardContent>
         </Card>
@@ -86,40 +92,49 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           <Card className="shadow-sm">
-            <CardHeader className="bg-muted/30 border-b">
-              <CardTitle>Recent Reports</CardTitle>
+            <CardHeader className="bg-muted/30 border-b flex flex-row items-center justify-between py-4">
+              <CardTitle className="text-lg">Recent Reports</CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="divide-y">
-                {reports.slice(0, 5).map(report => (
-                  <Link href={`/reports/${report.id}`} key={report.id} className="block group">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 bg-card hover:bg-muted/30 transition-colors">
-                      <div className="flex items-start gap-5">
-                        {report.image_url ? (
-                          <img src={report.image_url} alt="" className="w-20 h-20 rounded-lg object-cover hidden sm:block border shadow-sm" />
-                        ) : (
-                          <div className="w-20 h-20 rounded-lg bg-muted flex items-center justify-center hidden sm:flex border shadow-sm">
-                             <AlertCircle className="h-6 w-6 text-muted-foreground" />
-                          </div>
-                        )}
-                        <div>
-                          <h4 className="font-bold text-lg group-hover:text-primary transition-colors">{report.title}</h4>
-                          <div className="flex items-center text-sm text-muted-foreground mt-1.5 font-medium">
-                            <MapPin className="h-4 w-4 mr-1.5 text-primary" /> {report.location_text}
-                          </div>
-                          <div className="flex items-center gap-3 mt-3">
-                            <Badge variant="outline" className="text-xs capitalize font-semibold tracking-wide bg-background">{report.category.replace('_', ' ')}</Badge>
-                            <span className="text-xs text-muted-foreground">{new Date(report.created_at).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <Badge variant={report.status === 'resolved' ? 'default' : report.status === 'in_progress' ? 'secondary' : 'outline'} 
-                             className={`capitalize mt-4 sm:mt-0 text-sm px-3 py-1 ${report.status === 'resolved' ? 'bg-green-600 hover:bg-green-700 text-white border-transparent' : 'border-muted-foreground/30'}`}>
-                        {report.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  </Link>
-                ))}
+              <div className="divide-y divide-border overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="px-6 py-4 font-semibold">Issue & Location</th>
+                      <th className="px-6 py-4 font-semibold hidden sm:table-cell">Severity</th>
+                      <th className="px-6 py-4 font-semibold">Status</th>
+                      <th className="px-6 py-4 font-semibold hidden md:table-cell">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border">
+                    {reports.slice(0, 5).map(report => (
+                      <tr key={report.id} className="hover:bg-muted/30 transition-colors group">
+                        <td className="px-6 py-4">
+                           <Link href={`/reports/${report.id}`} className="block">
+                              <p className="font-semibold text-base group-hover:text-primary transition-colors">{report.title}</p>
+                              <p className="text-muted-foreground flex items-center mt-1 text-xs">
+                                <MapPin className="h-3 w-3 mr-1 text-primary"/> {report.location_text}
+                              </p>
+                           </Link>
+                        </td>
+                        <td className="px-6 py-4 hidden sm:table-cell">
+                          <Badge variant={report.severity === 'high' ? 'destructive' : report.severity === 'medium' ? 'default' : 'secondary'} className="uppercase text-[10px]">
+                            {report.severity}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Badge variant={report.status === 'resolved' ? 'default' : report.status === 'in_progress' ? 'secondary' : 'outline'} 
+                                 className={`capitalize px-2.5 py-0.5 text-xs whitespace-nowrap ${report.status === 'resolved' ? 'bg-green-600 hover:bg-green-700 text-white border-transparent' : 'border-muted-foreground/30'}`}>
+                            {report.status.replace('_', ' ')}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 hidden md:table-cell text-muted-foreground">
+                          {new Date(report.created_at).toLocaleDateString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </CardContent>
           </Card>
@@ -127,8 +142,9 @@ export default async function DashboardPage() {
         
         <div className="space-y-6">
           <Card className="shadow-sm">
-            <CardHeader className="bg-muted/30 border-b">
-              <CardTitle>Issues by Category</CardTitle>
+            <CardHeader className="bg-muted/30 border-b flex flex-row items-center gap-2 py-4">
+              <BarChart3 className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Issue Distribution</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
               <div className="space-y-5">
@@ -138,9 +154,34 @@ export default async function DashboardPage() {
                       <span className="capitalize font-semibold">{category.replace('_', ' ')}</span>
                       <span className="font-bold text-muted-foreground">{count}</span>
                     </div>
-                    <div className="w-full h-2.5 bg-muted rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                       <div 
                         className="h-full bg-primary transition-all duration-1000 ease-out" 
+                        style={{ width: `${(count / total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader className="bg-muted/30 border-b flex flex-row items-center gap-2 py-4">
+              <PieChart className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg">Status Distribution</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+               <div className="space-y-5">
+                {Object.entries(statuses).sort((a,b) => b[1] - a[1]).map(([status, count]) => (
+                  <div key={status} className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="capitalize font-semibold text-muted-foreground">{status.replace('_', ' ')}</span>
+                      <span className="font-bold">{count}</span>
+                    </div>
+                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full transition-all duration-1000 ease-out ${status === 'resolved' ? 'bg-green-500' : status === 'in_progress' ? 'bg-blue-500' : 'bg-muted-foreground/30'}`} 
                         style={{ width: `${(count / total) * 100}%` }}
                       />
                     </div>

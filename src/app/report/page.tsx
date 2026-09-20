@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle } from "lucide-react";
+import { Upload, Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle, Copy, Info } from "lucide-react";
 import { processImageAction, submitReportAction } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/lib/imageUtils";
@@ -26,6 +26,8 @@ export default function ReportPage() {
   const [loadingStage, setLoadingStage] = useState(0);
   const [createdReportId, setCreatedReportId] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -91,6 +93,20 @@ export default function ReportPage() {
     setStep("REVIEW");
   };
 
+  const loadDemoReport = () => {
+    setUploadError(null);
+    setImage("https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&q=80&w=800");
+    setAnalysis({
+      category: "waste",
+      severity: "high",
+      title: "Roadside garbage accumulation",
+      description: "A significant accumulation of mixed waste is visible beside the road.",
+      recommended_action: "Request municipal waste collection and cleanup.",
+      confidence: 0.94
+    });
+    setStep("REVIEW");
+  };
+
   const getLocation = () => {
     setIsLocating(true);
     if (navigator.geolocation) {
@@ -109,6 +125,9 @@ export default function ReportPage() {
   };
 
   const submitReport = async () => {
+    if (isSubmitting) return; // prevent double submit
+    
+    setIsSubmitting(true);
     setStep("SUBMITTING");
     const result = await submitReportAction({
       title: analysis.title || "Civic Issue Reported",
@@ -125,7 +144,16 @@ export default function ReportPage() {
       setCreatedReportId(result.data.id);
       setStep("SUCCESS");
     } else {
+      setIsSubmitting(false);
       setStep("LOCATION"); // allow retry
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (createdReportId) {
+      navigator.clipboard.writeText(createdReportId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -173,6 +201,11 @@ export default function ReportPage() {
               />
             </div>
           </CardContent>
+          <CardFooter className="flex justify-center border-t p-4 bg-muted/20">
+             <Button variant="link" onClick={loadDemoReport} className="text-muted-foreground hover:text-primary">
+               Try Demo Report
+             </Button>
+          </CardFooter>
         </Card>
       )}
 
@@ -209,7 +242,7 @@ export default function ReportPage() {
       )}
 
       {step === "REVIEW" && analysis && (
-        <Card className="overflow-hidden border-border shadow-md">
+        <Card className="overflow-hidden border-border shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="bg-primary/5 p-4 border-b flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -225,13 +258,20 @@ export default function ReportPage() {
               </Badge>
             )}
           </div>
-          <CardContent className="p-6 space-y-8">
+          <CardContent className="p-6 space-y-6">
             {analysis.confidence === 0 && (
               <div className="bg-muted/50 p-4 rounded-lg border text-sm flex items-start gap-3">
                  <div className="mt-0.5"><RefreshCw className="h-4 w-4 text-muted-foreground"/></div>
                  <p className="text-muted-foreground">We couldn&apos;t analyze this image automatically. Please describe the issue manually below.</p>
               </div>
             )}
+
+            <div className="bg-muted/30 p-3 rounded-lg border border-primary/10 flex items-start gap-3 text-sm">
+               <div className="mt-0.5"><Info className="h-4 w-4 text-primary"/></div>
+               <div className="text-muted-foreground leading-relaxed">
+                 <strong className="text-foreground">AI-assisted reporting:</strong> CivicFix uses AI to identify and structure civic issues. Please review and edit the generated information below before submitting.
+               </div>
+            </div>
           
             <div className="flex flex-col sm:flex-row gap-6">
               {image && (
@@ -311,7 +351,7 @@ export default function ReportPage() {
       )}
 
       {step === "LOCATION" && (
-        <Card className="shadow-md">
+        <Card className="shadow-md animate-in slide-in-from-right-4 duration-300">
           <CardHeader>
             <CardTitle>Where is this issue?</CardTitle>
             <CardDescription>Provide the location so authorities can find and resolve it.</CardDescription>
@@ -322,7 +362,7 @@ export default function ReportPage() {
               className="w-full h-16 text-lg rounded-xl flex items-center justify-center gap-3 bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary shadow-none border-primary/20 border"
               variant="outline"
               onClick={getLocation}
-              disabled={isLocating}
+              disabled={isLocating || isSubmitting}
             >
               {isLocating ? <Loader2 className="animate-spin h-5 w-5" /> : <Navigation className="h-5 w-5" />}
               {isLocating ? "Locating..." : "Use my current location"}
@@ -342,17 +382,19 @@ export default function ReportPage() {
               <div className="relative flex-1">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="e.g., Connaught Place, Delhi" 
+                  placeholder="e.g., Yamuna Vihar, Delhi" 
                   className="pl-9 h-12"
                   value={location}
                   onChange={e => setLocation(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex justify-between border-t p-6 bg-muted/20">
-            <Button variant="ghost" onClick={() => setStep("REVIEW")}>Back</Button>
-            <Button size="lg" onClick={submitReport} disabled={!location}>
+            <Button variant="ghost" onClick={() => setStep("REVIEW")} disabled={isSubmitting}>Back</Button>
+            <Button size="lg" onClick={submitReport} disabled={!location || isSubmitting}>
+              {isSubmitting ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : null}
               Submit Report
             </Button>
           </CardFooter>
@@ -374,41 +416,43 @@ export default function ReportPage() {
       {step === "SUCCESS" && (
         <Card className="border-primary/20 shadow-lg overflow-hidden animate-in fade-in zoom-in duration-500">
           <div className="bg-primary/5 py-12 flex flex-col items-center justify-center border-b border-primary/10">
-             <div className="h-24 w-24 bg-primary/20 rounded-full flex items-center justify-center mb-6 animate-bounce">
-                <CheckCircle className="h-12 w-12 text-primary" />
+             <div className="h-24 w-24 bg-primary/20 rounded-full flex items-center justify-center mb-6 relative">
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping opacity-75"></div>
+                <CheckCircle className="h-12 w-12 text-primary relative z-10" />
              </div>
              <h2 className="text-3xl font-bold text-center">Report Submitted</h2>
              <p className="text-muted-foreground mt-2 text-center max-w-sm">
-               Your report has been added to CivicFix and routed to the responsible team.
+               Your civic report has been successfully recorded.
              </p>
           </div>
           <CardContent className="p-8">
             <div className="bg-muted/30 rounded-xl p-6 space-y-4">
               <div className="flex justify-between items-center border-b pb-4">
                 <span className="text-muted-foreground font-medium">CivicFix ID</span>
-                <span className="font-mono font-bold">{createdReportId}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">Category</p>
-                  <p className="font-medium capitalize">{analysis?.category?.replace('_', ' ')}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Severity</p>
-                  <Badge variant={analysis?.severity === 'high' ? 'destructive' : analysis?.severity === 'medium' ? 'default' : 'secondary'} className="uppercase mt-1">
-                    {analysis?.severity}
-                  </Badge>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-lg">{createdReportId}</span>
+                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={copyToClipboard} title="Copy ID">
+                    {copied ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
+                  </Button>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Location</p>
-                <p className="font-medium flex items-center mt-1"><MapPin className="h-3 w-3 mr-1 text-primary"/> {location}</p>
+              <div className="pt-2">
+                 <h4 className="font-semibold text-lg">{analysis?.title}</h4>
+                 <div className="flex items-center gap-2 mt-2">
+                   <Badge variant="outline" className="capitalize">{analysis?.category?.replace('_', ' ')}</Badge>
+                   <Badge variant={analysis?.severity === 'high' ? 'destructive' : analysis?.severity === 'medium' ? 'default' : 'secondary'} className="uppercase">
+                      {analysis?.severity}
+                   </Badge>
+                 </div>
+              </div>
+              <div className="pt-2">
+                <p className="font-medium flex items-center mt-1 text-muted-foreground"><MapPin className="h-4 w-4 mr-1.5 text-primary"/> {location}</p>
               </div>
             </div>
           </CardContent>
           <CardFooter className="p-8 pt-0 flex justify-center">
              <Button size="lg" className="w-full h-14 text-lg" onClick={() => router.push(`/reports/${createdReportId}`)}>
-               Track Report Progress <ArrowRight className="ml-2 h-5 w-5" />
+               Track Report <ArrowRight className="ml-2 h-5 w-5" />
              </Button>
           </CardFooter>
         </Card>
