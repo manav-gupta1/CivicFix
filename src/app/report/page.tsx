@@ -8,9 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine } from "lucide-react";
+import { Upload, Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle } from "lucide-react";
 import { processImageAction, submitReportAction } from "@/app/actions";
 import { useRouter } from "next/navigation";
+import { compressImage } from "@/lib/imageUtils";
 
 type Step = "UPLOAD" | "ANALYZING" | "REVIEW" | "LOCATION" | "SUBMITTING" | "SUCCESS";
 
@@ -24,6 +25,7 @@ export default function ReportPage() {
   const [isLocating, setIsLocating] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
   const [createdReportId, setCreatedReportId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
@@ -43,13 +45,17 @@ export default function ReportPage() {
     }
   };
 
-  const processFile = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result as string);
-      analyzeUploadedImage(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+  const processFile = async (file: File) => {
+    setUploadError(null);
+    const { base64, error } = await compressImage(file);
+    
+    if (error) {
+      setUploadError(error);
+      return;
+    }
+    
+    setImage(base64);
+    analyzeUploadedImage(base64);
   }
 
   const analyzeUploadedImage = async (base64Img: string) => {
@@ -150,6 +156,14 @@ export default function ReportPage() {
               </div>
               <h3 className="font-semibold text-xl mb-2">Click or drag image to upload</h3>
               <p className="text-muted-foreground">Supported formats: JPG, PNG, WEBP</p>
+              
+              {uploadError && (
+                <div className="mt-6 flex items-center p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20 max-w-sm mx-auto">
+                  <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                  <span className="font-medium text-left">{uploadError}</span>
+                </div>
+              )}
+              
               <input 
                 type="file" 
                 className="hidden" 
