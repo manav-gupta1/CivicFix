@@ -24,15 +24,15 @@ export default function Home() {
         </div>
 
         <div className="container px-4 md:px-6 mx-auto relative z-10">
-          <div className="max-w-3xl space-y-8">
+          <div className="max-w-3xl space-y-6 md:space-y-8">
             <Badge variant="outline" className="text-primary border-primary/30 tracking-widest uppercase bg-primary/10 px-4 py-1.5 font-bold">
               Civic Intelligence
             </Badge>
-            <h1 className="text-5xl font-extrabold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl text-foreground uppercase leading-[1.1]">
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl text-foreground uppercase leading-[1.1]">
               Your city has a problem.<br />
               <span className="text-muted-foreground">You just have to show us.</span>
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl font-light leading-relaxed">
+            <p className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl font-light leading-relaxed">
               CivicFix turns photos of everyday civic problems into structured, trackable reports using AI.
             </p>
             
@@ -58,22 +58,22 @@ export default function Home() {
       <section className="w-full bg-muted/20 border-b border-border/40 backdrop-blur-md">
         <div className="container px-4 py-8 mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-left divide-x divide-border/50">
-              <div className="px-4">
-                <div className="text-4xl font-black text-foreground">127</div>
-                <div className="text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Reports</div>
+            <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 text-center md:text-left md:divide-x md:divide-border/50">
+              <div className="md:px-4">
+                <div className="text-3xl md:text-4xl font-black text-foreground">127</div>
+                <div className="text-[10px] md:text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Reports</div>
               </div>
-              <div className="px-4">
-                <div className="text-4xl font-black text-primary">83</div>
-                <div className="text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Resolved</div>
+              <div className="md:px-4">
+                <div className="text-3xl md:text-4xl font-black text-primary">83</div>
+                <div className="text-[10px] md:text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Resolved</div>
               </div>
-              <div className="px-4">
-                <div className="text-4xl font-black text-foreground">65%</div>
-                <div className="text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Resolution Rate</div>
+              <div className="md:px-4">
+                <div className="text-3xl md:text-4xl font-black text-foreground">65%</div>
+                <div className="text-[10px] md:text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Resolution Rate</div>
               </div>
-              <div className="px-4">
-                <div className="text-4xl font-black text-foreground">2.4<span className="text-2xl text-muted-foreground ml-1">d</span></div>
-                <div className="text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Avg. Resolution</div>
+              <div className="md:px-4">
+                <div className="text-3xl md:text-4xl font-black text-foreground">2.4<span className="text-xl md:text-2xl text-muted-foreground ml-1">d</span></div>
+                <div className="text-[10px] md:text-xs font-bold tracking-widest text-muted-foreground uppercase mt-2">Avg. Resolution</div>
               </div>
             </div>
             <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold opacity-60">
@@ -129,7 +129,7 @@ export default function Home() {
                 <h3 className="text-2xl font-bold tracking-widest uppercase">AI Analysis</h3>
               </div>
               
-              <div className="grid grid-cols-2 gap-6 font-mono text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 font-mono text-sm">
                 <div className="bg-background/50 border border-border/50 p-4 rounded-lg backdrop-blur-sm">
                   <div className="text-muted-foreground mb-1 text-xs">CATEGORY</div>
                   <div className="text-foreground text-lg font-bold">Waste</div>
@@ -161,7 +161,7 @@ export default function Home() {
            
            <Card className="w-full max-w-lg bg-card border-border/50 shadow-xl overflow-hidden rounded-xl">
              <div className="h-2 w-full bg-destructive" />
-             <CardContent className="p-8">
+             <CardContent className="p-6 md:p-8">
                 <div className="flex justify-between items-start mb-6">
                   <Badge variant="destructive" className="uppercase font-bold tracking-wider text-[10px] px-2 py-1 bg-destructive/20 text-destructive border-transparent">High Severity</Badge>
                   <div className="text-xs font-mono text-muted-foreground bg-muted px-2 py-1 rounded">CF-8A42F</div>
