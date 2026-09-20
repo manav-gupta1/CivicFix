@@ -8,15 +8,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle, Copy, Info } from "lucide-react";
+import { Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle, Copy, Info } from "lucide-react";
 import { processImageAction, submitReportAction } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/lib/imageUtils";
 
-type Step = "UPLOAD" | "ANALYZING" | "REVIEW" | "LOCATION" | "SUBMITTING" | "SUCCESS";
+type Step = "UPLOAD" | "PREVIEW" | "ANALYZING" | "REVIEW" | "LOCATION" | "SUBMITTING" | "SUCCESS";
 
 export default function ReportPage() {
   const [step, setStep] = useState<Step>("UPLOAD");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isCameraFlow, setIsCameraFlow] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,12 +33,16 @@ export default function ReportPage() {
   const [copied, setCopied] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, isCamera: boolean) => {
     const file = e.target.files?.[0];
     if (file) {
-      processFile(file);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setIsCameraFlow(isCamera);
+      setStep("PREVIEW");
     }
   };
 
@@ -43,7 +50,10 @@ export default function ReportPage() {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      processFile(file);
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+      setIsCameraFlow(false);
+      setStep("PREVIEW");
     }
   };
 
@@ -169,42 +179,110 @@ export default function ReportPage() {
       {step === "UPLOAD" && (
         <Card className="border-border shadow-sm">
           <CardHeader>
-            <CardTitle>Upload Photo</CardTitle>
-            <CardDescription>Take a picture or upload an image of the issue.</CardDescription>
+            <CardTitle>Report a Problem</CardTitle>
+            <CardDescription>Capture the issue directly or upload a photo.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div 
-              className="border-2 border-dashed rounded-xl p-16 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-colors cursor-pointer group"
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-            >
-              <div className="rounded-full bg-primary/10 p-5 mb-6 group-hover:scale-110 transition-transform">
-                <Upload className="h-10 w-10 text-primary" />
-              </div>
-              <h3 className="font-semibold text-xl mb-2">Click or drag image to upload</h3>
-              <p className="text-muted-foreground">Supported formats: JPG, PNG, WEBP</p>
-              
-              {uploadError && (
-                <div className="mt-6 flex items-center p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20 max-w-sm mx-auto">
-                  <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span className="font-medium text-left">{uploadError}</span>
+            <div className="flex flex-col sm:flex-row gap-4" onDragOver={(e) => e.preventDefault()} onDrop={handleDrop}>
+              <div 
+                className="flex-1 border-2 border-dashed rounded-xl p-8 sm:p-12 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-colors cursor-pointer group"
+                onClick={() => cameraInputRef.current?.click()}
+              >
+                <div className="rounded-full bg-primary/10 p-4 mb-4 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl">📷</span>
                 </div>
-              )}
-              
-              <input 
-                type="file" 
-                className="hidden" 
-                ref={fileInputRef} 
-                accept="image/*"
-                onChange={handleImageUpload}
-              />
+                <h3 className="font-semibold text-xl mb-2">Take a Photo</h3>
+                <p className="text-muted-foreground text-sm">Capture the issue now</p>
+                
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  ref={cameraInputRef} 
+                  accept="image/*"
+                  capture="environment"
+                  onChange={(e) => handleFileSelect(e, true)}
+                />
+              </div>
+
+              <div className="hidden sm:flex items-center justify-center text-muted-foreground font-medium uppercase text-sm">
+                or
+              </div>
+              <div className="sm:hidden flex items-center justify-center text-muted-foreground font-medium uppercase text-sm my-2">
+                or
+              </div>
+
+              <div 
+                className="flex-1 border-2 border-dashed rounded-xl p-8 sm:p-12 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-colors cursor-pointer group"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <div className="rounded-full bg-primary/10 p-4 mb-4 group-hover:scale-110 transition-transform">
+                  <span className="text-3xl">🖼️</span>
+                </div>
+                <h3 className="font-semibold text-xl mb-2">Upload Image</h3>
+                <p className="text-muted-foreground text-sm">Choose from your device</p>
+                
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  ref={fileInputRef} 
+                  accept="image/*"
+                  onChange={(e) => handleFileSelect(e, false)}
+                />
+              </div>
             </div>
+            
+            {uploadError && (
+              <div className="mt-6 flex items-center p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20 max-w-sm mx-auto">
+                <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                <span className="font-medium text-left">{uploadError}</span>
+              </div>
+            )}
           </CardContent>
           <CardFooter className="flex justify-center border-t p-4 bg-muted/20">
              <Button variant="link" onClick={loadDemoReport} className="text-muted-foreground hover:text-primary">
                Try Demo Report
              </Button>
+          </CardFooter>
+        </Card>
+      )}
+
+      {step === "PREVIEW" && (
+        <Card className="border-border shadow-sm overflow-hidden animate-in fade-in duration-300">
+          <CardHeader>
+            <CardTitle>Image Preview</CardTitle>
+            <CardDescription>Review your photo before analyzing.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0 border-y">
+            <div className="bg-muted">
+              {previewUrl && <img src={previewUrl} alt="Preview" className="w-full h-auto max-h-[60vh] object-contain" />}
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col sm:flex-row gap-3 justify-between p-6 bg-muted/20">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="w-full sm:w-auto"
+              onClick={() => {
+                if (isCameraFlow) {
+                  cameraInputRef.current?.click();
+                } else {
+                  fileInputRef.current?.click();
+                }
+              }}
+            >
+              <RefreshCw className="mr-2 h-4 w-4" /> Retake
+            </Button>
+            <Button 
+              size="lg" 
+              className="w-full sm:w-auto"
+              onClick={() => {
+                if (selectedFile) {
+                  processFile(selectedFile);
+                }
+              }}
+            >
+              Use Photo <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </CardFooter>
         </Card>
       )}
