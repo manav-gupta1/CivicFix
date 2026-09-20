@@ -24,9 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-sans", inter.variable)}>
-      <body className={`${geistMono.variable} antialiased min-h-screen flex flex-col`}>
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <html lang="en" className={cn("font-sans dark", inter.variable)}>
+      <body className={`${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}>
+        <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-md">
           <div className="container mx-auto flex h-16 items-center px-4 justify-between">
             <Link href="/" className="flex items-center space-x-2">
               <span className="text-2xl font-bold text-primary tracking-tight">CivicFix</span>

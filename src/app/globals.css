@@ -16,51 +16,73 @@
     --font-sans: var(--font-sans);
   }
   :root {
-    --background: oklch(0.99 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.5 0.15 250);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.95 0.02 250);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.95 0.02 250);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.95 0.02 250);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.9 0.02 250);
-    --input: oklch(0.9 0.02 250);
-    --ring: oklch(0.5 0.15 250);
-    --radius: 0.75rem;
+    --background: 220 10% 10%;
+    --foreground: 40 10% 95%;
+    
+    --card: 220 12% 14%;
+    --card-foreground: 40 10% 95%;
+    
+    --popover: 220 12% 14%;
+    --popover-foreground: 40 10% 95%;
+    
+    --primary: 38 92% 50%; /* Vibrant Amber */
+    --primary-foreground: 220 10% 10%;
+    
+    --secondary: 220 10% 20%;
+    --secondary-foreground: 40 10% 95%;
+    
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 65%;
+    
+    --accent: 220 10% 25%;
+    --accent-foreground: 40 10% 95%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 40 10% 95%;
+    
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
+    --ring: 38 92% 50%;
+    --radius: 0.5rem;
   }
+  
   .dark {
-    --background: oklch(0.15 0.02 250);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.2 0.02 250);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.2 0.02 250);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.6 0.15 250);
-    --primary-foreground: oklch(0.145 0 0);
-    --secondary: oklch(0.25 0.02 250);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.25 0.02 250);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.25 0.02 250);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(0.25 0.02 250);
-    --input: oklch(0.25 0.02 250);
-    --ring: oklch(0.6 0.15 250);
+    /* Same as root to force dark mode */
+    --background: 220 10% 10%;
+    --foreground: 40 10% 95%;
+    
+    --card: 220 12% 14%;
+    --card-foreground: 40 10% 95%;
+    
+    --popover: 220 12% 14%;
+    --popover-foreground: 40 10% 95%;
+    
+    --primary: 38 92% 50%;
+    --primary-foreground: 220 10% 10%;
+    
+    --secondary: 220 10% 20%;
+    --secondary-foreground: 40 10% 95%;
+    
+    --muted: 220 10% 20%;
+    --muted-foreground: 220 10% 65%;
+    
+    --accent: 220 10% 25%;
+    --accent-foreground: 40 10% 95%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 40 10% 95%;
+    
+    --border: 220 10% 20%;
+    --input: 220 10% 20%;
+    --ring: 38 92% 50%;
   }
+
   * {
-    border-color: var(--border);
+    border-color: hsl(var(--border));
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
   }
   html {
     @apply font-sans;
