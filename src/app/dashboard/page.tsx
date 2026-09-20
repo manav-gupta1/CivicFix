@@ -23,9 +23,11 @@ export default async function DashboardPage() {
     );
   }
 
-  const total = reports.length;
-  const resolved = reports.filter(r => r.status === 'resolved').length;
-  const resolutionRate = total > 0 ? Math.round((resolved / total) * 100) : 0;
+  // For the Hackathon Demo, we override the aggregate top-line stats to show a populated system.
+  // The charts below will still use the actual local seed data distributions.
+  const total = 127;
+  const resolved = 83;
+  const resolutionRate = 65;
   
   // Group by category
   const categories = reports.reduce((acc, curr) => {
@@ -41,9 +43,14 @@ export default async function DashboardPage() {
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8 animate-in fade-in duration-500">
-      <div className="mb-8 border-b pb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Civic Impact Dashboard</h1>
-        <p className="text-muted-foreground mt-2">Real-time overview of community issues and resolutions.</p>
+      <div className="mb-8 border-b pb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Civic Impact Dashboard</h1>
+          <p className="text-muted-foreground mt-2">Real-time overview of community issues and resolutions.</p>
+        </div>
+        <Badge variant="secondary" className="text-xs uppercase bg-yellow-100 text-yellow-800 border-yellow-200">
+          Demo / Sample Data
+        </Badge>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">

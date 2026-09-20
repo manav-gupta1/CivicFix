@@ -16,6 +16,19 @@ export interface Report {
 
 const seedReports: Report[] = [
   {
+    id: "CF-8A42F",
+    created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+    title: "Roadside garbage accumulation",
+    category: "waste",
+    severity: "high",
+    description: "A significant accumulation of mixed waste is visible beside the road.",
+    recommended_action: "Request municipal waste collection and cleanup.",
+    confidence: 0.94,
+    image_url: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&q=80&w=800",
+    location_text: "Yamuna Vihar, Delhi",
+    status: "in_progress"
+  },
+  {
     id: "CF-10480",
     created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     title: "Large pothole on main road",
