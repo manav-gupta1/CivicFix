@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle, Copy, Info } from "lucide-react";
+import { Loader2, MapPin, CheckCircle2, RefreshCw, ArrowRight, CheckCircle, Navigation, PencilLine, AlertCircle, Copy, Info, X } from "lucide-react";
 import { processImageAction, submitReportAction } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/lib/imageUtils";
@@ -31,6 +31,20 @@ export default function ReportPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    // Only show onboarding to first-time users
+    const hasSeenOnboarding = localStorage.getItem("civicfix-onboarded");
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const dismissOnboarding = () => {
+    setShowOnboarding(false);
+    localStorage.setItem("civicfix-onboarded", "true");
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -169,6 +183,26 @@ export default function ReportPage() {
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-12">
+      {showOnboarding && step === "UPLOAD" && (
+        <div className="mb-8 bg-primary/5 border border-primary/20 rounded-xl p-6 relative animate-in fade-in slide-in-from-top-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="absolute top-2 right-2 h-8 w-8 text-muted-foreground hover:text-foreground"
+            onClick={dismissOnboarding}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+          <h2 className="text-xl font-bold mb-2 text-foreground">Welcome to CivicFix! 👋</h2>
+          <p className="text-muted-foreground mb-4 text-sm">Help improve your neighborhood in 3 simple steps:</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm font-medium">
+            <div className="flex items-center gap-2"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">1</span> Snap a photo</div>
+            <div className="flex items-center gap-2"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">2</span> AI extracts details</div>
+            <div className="flex items-center gap-2"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-primary">3</span> Submit & Track</div>
+          </div>
+        </div>
+      )}
+
       {step !== "SUCCESS" && (
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold tracking-tight">Report a Problem</h1>

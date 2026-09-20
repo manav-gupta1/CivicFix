@@ -11,13 +11,22 @@ export default async function ReportTrackingPage({ params }: { params: { id: str
   if (!report) {
     // Empty / Not Found State
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-24 text-center">
-        <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto mb-6 opacity-50" />
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Report Not Found</h1>
-        <p className="text-muted-foreground mb-8">The report you are looking for does not exist or has been removed.</p>
-        <Link href="/dashboard">
-          <Button size="lg">Return to Dashboard</Button>
-        </Link>
+      <div className="container mx-auto max-w-4xl px-4 py-24 text-center animate-in fade-in zoom-in duration-500">
+        <div className="h-24 w-24 bg-muted rounded-full flex items-center justify-center mx-auto mb-8 border border-border">
+          <AlertTriangle className="h-12 w-12 text-muted-foreground opacity-70" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight mb-4">Report Not Found</h1>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg leading-relaxed">
+          We couldn&apos;t find a report with this ID. If you just spotted a civic issue in your neighborhood, you can report it instantly using CivicFix AI.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/report">
+            <Button size="lg" className="h-12 px-8 text-base w-full sm:w-auto">Report an Issue</Button>
+          </Link>
+          <Link href="/dashboard">
+            <Button size="lg" variant="outline" className="h-12 px-8 text-base w-full sm:w-auto">Return to Dashboard</Button>
+          </Link>
+        </div>
       </div>
     );
   }

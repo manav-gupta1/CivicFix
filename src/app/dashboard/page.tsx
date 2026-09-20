@@ -10,14 +10,24 @@ export default async function DashboardPage() {
   
   if (reports.length === 0) {
     return (
-      <div className="container mx-auto max-w-4xl px-4 py-24 text-center">
-        <Activity className="h-16 w-16 text-primary mx-auto mb-6 opacity-80" />
-        <h1 className="text-3xl font-bold tracking-tight mb-2">Community Impact</h1>
-        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-          Community data will appear here as reports are submitted. Be the first to report an issue!
+      <div className="container mx-auto max-w-4xl px-4 py-24 text-center animate-in fade-in zoom-in duration-500">
+        <div className="h-24 w-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-8">
+          <BarChart3 className="h-12 w-12 text-primary opacity-80" />
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight mb-4">No Civic Data Yet</h1>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto text-lg leading-relaxed">
+          The dashboard aggregates community reports to help municipalities prioritize infrastructure repairs. It looks like you&apos;re the first one here!
         </p>
+        <div className="bg-muted/30 border rounded-xl p-6 max-w-sm mx-auto mb-8 text-sm text-left">
+          <h3 className="font-semibold mb-2">How to get started:</h3>
+          <ul className="space-y-2 text-muted-foreground">
+             <li className="flex gap-2"><Activity className="h-4 w-4 mt-0.5 text-primary"/> Take a photo of a local issue</li>
+             <li className="flex gap-2"><Activity className="h-4 w-4 mt-0.5 text-primary"/> Let AI structure the report</li>
+             <li className="flex gap-2"><Activity className="h-4 w-4 mt-0.5 text-primary"/> Watch community impact grow here</li>
+          </ul>
+        </div>
         <Link href="/report">
-          <Button size="lg">Report an Issue</Button>
+          <Button size="lg" className="h-12 px-8 text-base">Submit the First Report</Button>
         </Link>
       </div>
     );
